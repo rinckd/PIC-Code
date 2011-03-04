@@ -18,29 +18,29 @@ __CONFIG(11111110110010);
 * bit 0-1 	Mode Bits
 *************************************************************/
 #define CLOCKWISE			1
-#define COUNTERCLOCKWISE		0
+#define COUNTERCLOCKWISE	0
 #define VREF				160 // starting velocity reference
 #define BIAS				160  // bias
-#define KP				12 	// proportional constant
-#define KD				4 	// derivative controller gains
-#define KI				2	// integral controller gain
+#define KP			    	12 	// proportional constant
+#define KD			    	4 	// derivative controller gains
+#define KI			    	2	// integral controller gain
 
 #define GetBit(var, bit) ((var & (1 << bit)) != 0) // Returns true/false if bit is set
 #define SetBit(var, bit) (var |= (1 << bit))
 #define FlipBit(var, bit) (var ^= (1 << bit))
 #define ClearBit(var, bit) (var &= ~(1 << bit))
 
-#define PORTBIT(adr, bit)		((unsigned)(&adr)*8+(bit))
+#define PORTBIT(adr, bit)	((unsigned)(&adr)*8+(bit))
 static bit 	tachometer @ 	PORTBIT(PORTA,1);
 static bit	blackButton @	PORTBIT(PORTA,4);
-static bit	direction @	PORTBIT(PORTC,0);
-static bit	brake @		PORTBIT(PORTC,1);
-static bit	pwm @		PORTBIT(PORTC,2);
-static bit 	eddy @		PORTBIT(PORTC,3);
+static bit	direction @	    PORTBIT(PORTC,0);
+static bit	brake @		    PORTBIT(PORTC,1);
+static bit	pwm @		    PORTBIT(PORTC,2);
+static bit 	eddy @		    PORTBIT(PORTC,3);
 static bit 	octal1 @		PORTBIT(PORTC,4);
 static bit 	octal2 @		PORTBIT(PORTC,5);
-static bit	encoderB @	PORTBIT(PORTC,6);
-static bit 	encoderA @	PORTBIT(PORTC,7);
+static bit	encoderB @	    PORTBIT(PORTC,6);
+static bit 	encoderA @	    PORTBIT(PORTC,7);
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%/
 // Function Declarations
@@ -101,11 +101,11 @@ void InitPorts()
 	TRISC=0B11111000;		// Port C motor outputs at pins 0-2, inputs at pins 3-7
 	
 	ADCON0 = 0b00001001;	// set up for fast operation (fosc/2)
-	ADCON1 = 0B00000000;	// RA1 is analog?	
+	ADCON1 = 0B00000000;	// RA1 is analog	
 	
 	PR2 = 0b11111111;		// max PWM motor frequency is 20khz
 	T2CON =0B0000100;		// Timer 
-	TMR2ON = 1;			// Start Timer
+	TMR2ON = 1;		    	// Start Timer
 	
 	CCP1CON = 0b00111100;	// Sets PWM on, holds LSb of duty cycle
 	CCPR1L=0B00000000;		// duty cycle - sets speed (initiate at zero, adjust this later to adjust speed)
@@ -185,7 +185,7 @@ void Constant ()
 void Decrease()
 {
 	rotationCount=0;				// reset rotation counter at beginning of routine
-	while (avg>150)				// ramp down until speed is back to VREF2
+	while (avg>150)			    	// ramp down until speed is back to VREF2
 	{
 		InitAtoD();					// get Tachometer feedback
 		Control();					// use feedback to control speed
@@ -206,9 +206,9 @@ void Decrease()
 		speed--;					// decrement speed every revolution
 		rotationCount++;			// count revolutions
 	}	
-	brake=1;			// apply brake after trapazoid is done
-	MoveMotor(CLOCKWISE, 0); // turn off motor
-	FlashLED();			// flash LEDs when routine is done
+	brake=1;		            	// apply brake after trapazoid is done
+	MoveMotor(CLOCKWISE, 0);        // turn off motor
+	FlashLED();		            	// flash LEDs when routine is done
 }
 void Control()
 {
@@ -222,7 +222,7 @@ void Control()
 			break;
 		case 2:
 			feedback=(KP*error)+(KD*(previousError-error));
-			MoveMotor(CLOCKWISE, 255); //test
+			MoveMotor(CLOCKWISE, 255); 
 			break;
 		case 3:
 			feedback = (KP*error)+(KD*(previousError-error))+(KI*(previousError+error));
@@ -230,7 +230,7 @@ void Control()
 	}
 	if (feedback>255) 
 	{	
-		feedback=255;		// max speed is 255
+		feedback=255;
 	}
 	if (feedback<0)
 	{
@@ -243,7 +243,7 @@ void EddyStart()		// Start routine - rotate disk slowly four times
 {
 	char eddyCount=0;		// Set eddyCount
 	eddyToggle=0; 			// "bit eddyToggle" generated an error that bit variables needed to be global --?
-	brake = 0;		 	// make sure brake is not applied
+	brake = 0;		    	// make sure brake is not applied
 	while(eddyCount<=4) 
 	{
 		MoveMotor(CLOCKWISE, VREF); // move motor slowly
